@@ -1,1 +1,225 @@
-# PA-Homework-1
+# Problema 1 - Feribot
+
+## Descrierea soluției
+
+Soluția constă în următoarele etape:
+
+### 1. Căutare binară
+
+Am realizat o căutare binară pe valoarea sumei maxime minime folosind două limite:
+- sumaMinima (cel mai mare element din lista de elemente)
+- sumaMaxima (suma tuturor elementelor)
+
+În cadrul acestei căutări binare, verificăm continuu dacă putem împărți elementele în subgrupuri (feriboturi) care au o greutate maximă mai mică sau egală cu valoarea curentă a lui mid. Căutarea se oprește atunci când intervalul de căutare devine invalid (minSum > maxSum).
+
+### 2. Verificarea soluției (Greedy)
+
+În cadrul fiecărei iterații a căutării binare, verificăm, folosind un algoritm de tip Greedy, dacă putem împărți elementele în k sau mai puține feriboturi, fiecare având o greutate maximă mai mică sau egală cu valoarea curentă de mid.
+
+### 3. Actualizarea soluției
+
+Dacă soluția curentă este validă (adică folosim k sau mai puține feriboturi), salvăm această soluție și continuăm să căutăm o valoare mai bună (mai mică). La final, când căutarea binară se termină, afișăm ultima soluție validă, care va reprezenta valoarea optimă a sumei maxime minime.
+
+### 4. Detaliile implementării
+
+- **Inițializare**: Setăm minSum la cel mai mare element din listă și maxSum la suma tuturor elementelor.
+- **Căutare binară**: În cadrul fiecărei iterații, calculăm mid = (minSum + maxSum) / 2, iar dacă soluția pentru acest mid este validă (poate fi realizată cu k feriboturi), actualizăm soluția curentă.
+- **Greedy**: Algoritmul greedy verifică dacă putem împărți lista de elemente în feriboturi care respectă restricția impusă de valoarea curentă a lui mid.
+
+## Complexitatea algoritmică
+
+### 1. Timp de execuție
+
+- Căutarea binară are complexitatea O(log(sumMax - sumMin)), unde sumMax este suma totală a elementelor și sumMin este cel mai mare element din lista de elemente.
+- În cadrul fiecărei iterații a căutării binare, verificăm validitatea soluției folosind un algoritm Greedy, cu complexitatea O(n), unde n este numărul de elemente.
+- Astfel, complexitatea totală devine O(n * log(sumMax - sumMin)).
+
+### 2. Complexitate spațială
+
+- Folosim un singur vector pentru stocarea elementelor și câteva variabile auxiliare pentru a implementa căutarea binară și algoritmul Greedy.
+- Prin urmare, complexitatea spațială este O(n), unde n este numărul de elemente.
+
+## Rezultatul final
+
+La final, soluția optimă este afișată în fișierul de ieșire.
+
+---
+
+# Problema 2 - Stocks
+
+## Descrierea soluției
+
+Soluția se bazează pe tehnica programării dinamice pentru a gestiona eficient combinațiile de investiții posibile.
+
+### 1. Structura de date
+
+Fiecare acțiune este descrisă prin:
+- currVal: prețul actual (cât costă să o cumperi)
+- minVal: valoarea minimă posibilă la finalul anului
+- maxVal: valoarea maximă posibilă la finalul anului
+
+De aici se derivă:
+- pierderea potențială = currVal - minVal
+- profitul potențial = maxVal - currVal
+
+### 2. Matricea dp
+
+Se definește o matrice dp[i][j] unde:
+- i reprezintă suma investită (≤ B)
+- j reprezintă pierderea acceptată în cel mai rău scenariu (≤ L)
+- dp[i][j] reține profitul maxim posibil în cel mai bun scenariu, respectând acele constrângeri.
+
+Matricea este inițializată cu -1 pentru a marca stările imposibile, cu excepția stării de bază dp[0][0] = 0 (nu am investit nimic, deci nici pierdere, nici profit).
+
+### 3. Actualizarea soluției (Programare Dinamică)
+
+Pentru fiecare acțiune, iterăm în ordine descrescătoare prin buget (j) și pierdere (k) pentru a preveni reutilizarea aceleiași acțiuni de mai multe ori (deoarece putem cumpăra o singură dată fiecare acțiune).
+
+Dacă dp[j - cost][k - loss] este valid, actualizăm:
+dp[j][k] = max(dp[j][k], dp[j - cost][k - loss] + profit);
+
+### 4. Determinarea rezultatului final
+
+La final, parcurgem întreaga matrice dp și căutăm cel mai mare profit posibil, fără a depăși bugetul B și pierderea L.
+
+## Complexitatea algoritmică
+
+### 1. Complexitate temporală
+
+- Dimensiunea matricii dp este O(B * L), unde B reprezintă bugetul maxim și L reprezintă limita de pierdere.
+- Pentru fiecare acțiune (N), actualizăm toate stările matricei dp. Astfel, complexitatea totală devine O(N * B * L), unde N este numărul de acțiuni.
+- Aceasta este acceptabilă pentru constrângerile date (N ≤ 100, B ≤ 500, L ≤ 100).
+
+### 2. Complexitate spațială
+
+- Matricea dp are dimensiunea O(B * L), deci complexitatea spațială este O(B * L).
+- În plus, pentru fiecare acțiune, folosim o serie de variabile auxiliare pentru actualizarea matricii, dar care nu afectează semnificativ complexitatea spațială.
+
+## Rezultatul final
+
+La final, profitul maxim este scris în fișierul stocks.out.
+
+## Alte detalii
+
+Soluția tratează corect cazul în care nu este posibilă nicio investiție (va afișa 0).
+
+---
+
+# Problema 3 - BadGPT
+
+## Descrierea soluției
+
+Problema pornește de la un context special în care caracterele `m` și `w` sunt înlocuite în fișierele PDF cu `nn`, respectiv `uu`. Astfel, la decodificare, șiruri precum `nnnn` pot fi interpretate în mai multe moduri (ex: `nn nn`, `n n n n`, `m n`, etc).
+
+### 1. Observație cheie
+
+Numărul de moduri de a interpreta un șir de `n` caractere `n` sau `u` urmează exact **șirul lui Fibonacci**.  
+Exemple:
+- `n` → 1 mod  
+- `nn` → 2 moduri (`n n`, `m`)  
+- `nnn` → 3 moduri (`n n n`, `m n`, `n m`)  
+
+Astfel, pentru fiecare bloc de caractere identice `n` sau `u` cu o anumită lungime `L`, trebuie să calculăm al `L+1`-lea termen Fibonacci (modulo 10⁹+7).
+
+### 2. Calculul eficient al Fibonacci
+
+Pentru a calcula Fibonacci rapid pentru valori foarte mari (`L` până la 10¹⁸), folosim **exponențiere rapidă cu matrice**:
+
+Matricea de recurență Fibonacci este:
+
+```
+| F(n+1) F(n)   |   = (| 1 1 |)^n
+| F(n)   F(n-1) |     (| 1 0 |)
+```
+
+Folosim înmulțirea și ridicarea la putere a matricilor 2x2 pentru a obține rezultatul în timp logaritmic.
+
+## Detalii implementare
+
+### 1. Citirea datelor
+
+Datele de intrare sunt citite din fișierul `badgpt.in` și reprezintă un șir codificat în format `l1n1l2n2...`, unde:
+- `li` este un caracter (`a`...`z`)
+- `ni` este un număr mare (poate ajunge până la 10¹⁸)
+
+### 2. Parcurgerea șirului
+
+Pentru fiecare caracter `li`:
+- Dacă este `n` sau `u`, calculăm `fibo(ni + 1)` și îl înmulțim în rezultatul final.
+
+### 3. Exponențierea rapidă
+
+- Implementarea este făcută folosind `while (n > 0)` și înmulțiri de matrici.
+- Este folosită o matrice de identitate și o matrice de bază `{{1, 1}, {1, 0}}`.
+
+## Complexitatea algoritmică
+
+### 1. Complexitate temporală
+
+- Calculul Fibonacci: **O(log n)** pentru fiecare bloc
+- Parcurgerea șirului: **O(k)** unde k = numărul de caractere în șir (maxim 10⁵ - 10⁶ în practică)
+- Complexitate totală: **O(k · log n)**
+
+### 2. Complexitate spațială
+
+- Spațiu constant **O(1)**, deoarece lucrăm doar cu matrice 2x2 pentru calculul Fibonacci.
+
+## Rezultatul final
+
+Rezultatul este scris în fișierul `badgpt.out` și reprezintă **numărul total de moduri** în care șirul poate fi decodat, modulo `10^9 + 7`.
+
+## Alte detalii
+
+- Se verifică deschiderea corectă a fișierelor de intrare și ieșire.
+- Codul este optimizat pentru valori mari ale lui `ni`.
+- Evităm recalcularea inutilă a Fibonacci și folosim doar multiplicări matriceale.
+
+---
+
+# Problema 4 - Crypto
+
+## Descrierea soluției
+
+Soluția se bazează pe programarea dinamică pentru a număra modurile de a forma un prefix de lungime l din s folosind caracterele din k. În k pot apărea caractere fixe și wildcard-uri (?), iar pentru fiecare wildcard, încercăm toate literele posibile din s.
+
+### 1. Definirea matricei dp
+
+Matricea dp[i][j] reprezintă numărul de moduri de a forma un prefix de lungime j din șirul s folosind primele i caractere din șirul k.
+
+Inițializăm dp[0][0] = 1, care reprezintă cazul de bază: nu am ales încă niciun caracter și nu am făcut nicio potrivire.
+
+La fiecare pas, verificăm dacă caracterul din k este un wildcard (?) sau un caracter fix și actualizăm matricea dp corespunzător.
+
+### 2. Cazul de wildcard (?)
+
+Dacă caracterul din k este un wildcard (?), încercăm toate literele din s și actualizăm matricea dp pentru fiecare literă posibilă. Dacă litera se potrivește cu caracterul din s, actualizăm dp[i+1][j+1] pentru a reflecta o potrivire reușită.
+
+### 3. Cazul caracterului fix
+
+Dacă caracterul din k nu este un wildcard (?), doar actualizăm dp[i+1][j] pentru a reflecta faptul că acest caracter nu modifică prefixul curent. Dacă acest caracter coincide cu caracterul din s[j], actualizăm și dp[i+1][j+1] pentru a reflecta o potrivire.
+
+## Complexitatea algoritmică
+
+### 1. Complexitate temporală
+
+- Matricea dp are dimensiunea (n+1) x (l+1), unde n este lungimea șirului k și l este lungimea șirului s.
+- În cazul wildcard-ului, trebuie să iterăm prin literele din s, ceea ce poate adăuga o complexitate suplimentară.
+- Complexitatea totală este O(n * l * m), unde:
+  - n este lungimea șirului k.
+  - l este lungimea șirului s.
+  - m este numărul de litere unice din s.
+
+### 2. Complexitate spațială
+
+- Matricea dp are dimensiunea (n+1) x (l+1) și stochează numărul de moduri pentru fiecare stare posibilă.
+- Complexitatea spațială este O(n * l).
+
+## Rezultatul final
+
+La final, soluția optimă este scrisă în fișierul de ieșire, reprezentând numărul total de moduri în care un prefix de lungime l poate fi obținut din k, modulo 10^9 + 7.
+
+## Alte detalii
+
+- Se verifică corectitatea deschiderii fișierelor de intrare și ieșire.
+- Programul este optimizat pentru a gestiona toate cazurile posibile, inclusiv wildcard-uri multiple.
+- Se utilizează programarea dinamică pentru a reduce complexitatea și a gestiona eficient toate stările intermediare.
